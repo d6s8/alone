@@ -2,3 +2,8 @@
 .env.*
 !.env.example
 .vercel/
+.vscode/
+.api
+
+
+.updates

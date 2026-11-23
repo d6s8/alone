@@ -294,6 +294,54 @@
     return shapeIndices.every((shapeIndex) => anyPieceFits(shapeIndex, board, size));
   }
 
+  function blockCoversCell(shape, top, left, row, column) {
+    return shape.some(([dr, dc]) => top + dr === row && left + dc === column);
+  }
+
+  // These placement heuristics mirror block-blast-engine/grid.ts.
+  function blockPlacementStats(board, size, shapeIndex, top, left) {
+    const shape = blockShapes[shapeIndex];
+    const blocked = (row, column) =>
+      row < 0 || column < 0 || row >= size || column >= size ||
+      board[row][column] !== 0 || blockCoversCell(shape, top, left, row, column);
+    let edges = 0;
+    let touching = 0;
+    let sealed = 0;
+
+    for (const [dr, dc] of shape) {
+      for (const [row, column] of [
+        [top + dr - 1, left + dc], [top + dr + 1, left + dc],
+        [top + dr, left + dc - 1], [top + dr, left + dc + 1],
+      ]) {
+        if (blockCoversCell(shape, top, left, row, column)) continue;
+        edges++;
+        if (blocked(row, column)) {
+          touching++;
+        } else if (
+          blocked(row - 1, column) && blocked(row + 1, column) &&
+          blocked(row, column - 1) && blocked(row, column + 1)
+        ) {
+          sealed++;
+        }
+      }
+    }
+
+    const next = board.map(row => row.slice());
+    for (const [dr, dc] of shape) next[top + dr][left + dc] = 1;
+    const candidateRows = new Set(shape.map(([dr]) => top + dr));
+    const candidateColumns = new Set(shape.map(([, dc]) => left + dc));
+    let lines = 0;
+    for (const row of candidateRows) if (next[row].every(value => value !== 0)) lines++;
+    for (const column of candidateColumns) if (next.every(row => row[column] !== 0)) lines++;
+
+    return { contact: edges ? touching / edges : 0, sealed, lines, touching };
+  }
+
+  function blockPlacementFit(board, size, shapeIndex, top, left) {
+    const stats = blockPlacementStats(board, size, shapeIndex, top, left);
+    return stats.contact - 0.6 * stats.sealed + 0.5 * Math.min(stats.lines, 2);
+  }
+
   function greedyPlacement(board, size, shapeIndex) {
     const shape = blockShapes[shapeIndex];
     const h = Math.max(...shape.map(([dr]) => dr)) + 1;
@@ -301,28 +349,25 @@
     let best = null;
     let bestScore = -Infinity;
     const filledBefore = board.reduce((sum, row) => sum + row.reduce((s, v) => s + v, 0), 0) + shape.length;
+
     for (let r = 0; r + h <= size; r++) {
       for (let c = 0; c + w <= size; c++) {
         if (!pieceFitsAt(shapeIndex, r, c, board, size)) continue;
         const next = board.map(row => row.slice());
         for (const [dr, dc] of shape) next[r + dr][c + dc] = 1;
-        let cleared = 0;
+        const fullRows = next
+          .map((row, index) => row.every(value => value !== 0) ? index : -1)
+          .filter(index => index >= 0);
+        const fullColumns = Array.from({ length: size }, (_, column) => column)
+          .filter(column => next.every(row => row[column] !== 0));
         for (let rr = 0; rr < size; rr++) {
-          if (next[rr].every(v => v !== 0)) { next[rr] = new Array(size).fill(0); cleared++; }
-        }
-        for (let cc = 0; cc < size; cc++) {
-          if (next.every(row => row[cc] !== 0)) { for (let rr = 0; rr < size; rr++) next[rr][cc] = 0; cleared++; }
-        }
-        const filledAfter = next.reduce((sum, row) => sum + row.reduce((s, v) => s + v, 0), 0);
-        let edges = 0, touching = 0;
-        for (const [dr, dc] of shape) {
-          for (const [nr, nc] of [[r+dr-1, c+dc], [r+dr+1, c+dc], [r+dr, c+dc-1], [r+dr, c+dc+1]]) {
-            if (nr === r+dr && nc === c+dc) continue;
-            edges++;
-            if (nr < 0 || nc < 0 || nr >= size || nc >= size || next[nr][nc] !== 0) touching++;
+          for (let cc = 0; cc < size; cc++) {
+            if (fullRows.includes(rr) || fullColumns.includes(cc)) next[rr][cc] = 0;
           }
         }
-        const score = (filledBefore - filledAfter) * 10 + (edges > 0 ? touching / edges : 0);
+        const filledAfter = next.reduce((sum, row) => sum + row.reduce((s, v) => s + v, 0), 0);
+        const snugness = blockPlacementStats(board, size, shapeIndex, r, c).touching;
+        const score = (filledBefore - filledAfter) * 10 + snugness;
         if (score > bestScore) { bestScore = score; best = next; }
       }
     }
@@ -397,7 +442,7 @@
 
   // ---- Floating score pop-ups ----
 
-  function spawnFloatingPoints(clientX, clientY, value, isCombo = false) {
+  function spawnFloatingPoints(clientX, clientY, value) {
     const rect = blockBoardElement.getBoundingClientRect();
     const x = clientX - rect.left;
     const y = clientY - rect.top;
@@ -406,26 +451,18 @@
     el.textContent = "+" + value;
     el.style.left = x + "px";
     el.style.top = y + "px";
-    // Start with slight scale-up for combo effects
-    el.style.transform = isCombo ? "scale(1.2)" : "scale(1)";
-    el.style.opacity = "1";
     blockFloatingScoresElement.appendChild(el);
-    floatingScores.push({ x, y, value, life: 1.0, el, isCombo });
+    floatingScores.push({ x, y, value, life: 1.0, el });
   }
 
   function updateFloatingScores(delta) {
     for (let i = floatingScores.length - 1; i >= 0; i--) {
       const fs = floatingScores[i];
       fs.life -= delta * 1.2;
-      // Faster downward movement for combo pop-ups
-      const verticalSpeed = fs.isCombo ? 80 : 60;
-      fs.y -= delta * verticalSpeed;
+      fs.y -= delta * 60;
       fs.el.style.top = fs.y + "px";
-      // Animate opacity and slight vertical float
       fs.el.style.opacity = String(Math.max(0, fs.life));
-      // Scale down from initial combo boost
-      const scale = Math.max(0.8, fs.life);
-      fs.el.style.transform = "scale(" + scale + ") translateY(" + String(-(1 - fs.life) * 30) + "px)";
+      fs.el.style.transform = "translateY(" + String(-(1 - fs.life) * 40) + "px)";
       if (fs.life <= 0) {
         fs.el.remove();
         floatingScores.splice(i, 1);
@@ -647,20 +684,7 @@
           for (let r = 0; r + h <= size; r++) {
             for (let c = 0; c + w <= size; c++) {
               if (!pieceFitsAt(pieceIndex, r, c, blockBoard, size)) continue;
-              const next = blockBoard.map(row => row.slice());
-              for (const [dr, dc] of shape) next[r + dr][c + dc] = 1;
-              let lines = 0;
-              for (let rr = 0; rr < size; rr++) { if (next[rr].every(v => v !== 0)) lines++; }
-              for (let cc = 0; cc < size; cc++) { if (next.every(row => row[cc] !== 0)) lines++; }
-              let edges = 0, touching = 0;
-              for (const [dr, dc] of shape) {
-                for (const [nr, nc] of [[r+dr-1, c+dc], [r+dr+1, c+dc], [r+dr, c+dc-1], [r+dr, c+dc+1]]) {
-                  if (nr === r+dr && nc === c+dc) continue;
-                  edges++;
-                  if (nr < 0 || nc < 0 || nr >= size || nc >= size || blockBoard[nr][nc] !== 0) touching++;
-                }
-              }
-              bestFitScore = Math.max(bestFitScore, (edges > 0 ? touching / edges : 0) + 0.5 * Math.min(lines, 2));
+              bestFitScore = Math.max(bestFitScore, blockPlacementFit(blockBoard, size, pieceIndex, r, c));
             }
           }
           fit = bestFitScore;
@@ -714,7 +738,7 @@
 
   function anyBlockShapeFits() {
     const candidates = blockPieces.filter((shapeIndex) => shapeIndex !== null);
-    if (blockMode === "hold" && blockHeldShape !== null && !blockHoldUsedThisTurn) {
+    if (blockMode === "hold" && blockHeldShape !== null) {
       candidates.push(blockHeldShape);
     }
 
@@ -825,6 +849,73 @@
         ? "hold · choose a piece"
         : "hold · swap with this piece";
     drawShapePreview(blockHoldPreview, blockHeldShape);
+  }
+
+  function motionIsReduced() {
+    return typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+
+  function animateBlockClears(rows, columns) {
+    if (motionIsReduced() || typeof Element.prototype.animate !== "function") return;
+    const rect = blockBoardElement.getBoundingClientRect();
+    const overlay = blockBoardElement.cloneNode(true);
+    overlay.removeAttribute("id");
+    overlay.setAttribute("aria-hidden", "true");
+    Object.assign(overlay.style, {
+      position: "fixed",
+      left: `${rect.left}px`,
+      top: `${rect.top}px`,
+      width: `${rect.width}px`,
+      height: `${rect.height}px`,
+      margin: "0",
+      zIndex: "1000",
+      pointerEvents: "none",
+    });
+    document.body.append(overlay);
+
+    const rowSet = new Set(rows);
+    const columnSet = new Set(columns);
+    const animations = [];
+    overlay.querySelectorAll(".block-cell").forEach((cell) => {
+      const row = Number(cell.dataset.row);
+      const column = Number(cell.dataset.column);
+      if (!rowSet.has(row) && !columnSet.has(column)) return;
+      animations.push(cell.animate(
+        [
+          { transform: "scale(1) rotate(0deg)", opacity: 1 },
+          { transform: "scale(.15) rotate(12deg)", opacity: 0 },
+        ],
+        { duration: 230, delay: (row + column) * 9, easing: "cubic-bezier(.3,0,.7,1)", fill: "forwards" },
+      ));
+    });
+    Promise.all(animations.map((animation) => animation.finished.catch(() => undefined)))
+      .then(() => overlay.remove());
+  }
+
+  function animateBlockPlacement(shape, top, left, clearedLineCount) {
+    if (motionIsReduced() || typeof Element.prototype.animate !== "function") return;
+    shape.forEach(([dr, dc], index) => {
+      const cell = blockBoardElement.querySelector(`[data-row="${top + dr}"][data-column="${left + dc}"]`);
+      if (!cell || !cell.classList.contains("is-filled")) return;
+      cell.animate(
+        [
+          { transform: "scale(.55)", opacity: 0.45 },
+          { transform: "scale(1.08)", opacity: 1, offset: 0.72 },
+          { transform: "scale(1)", opacity: 1 },
+        ],
+        { duration: 210, delay: index * 18, easing: "cubic-bezier(.2,.8,.2,1)" },
+      );
+    });
+    if (clearedLineCount > 0) {
+      blockBoardElement.animate(
+        [
+          { filter: "brightness(1)" },
+          { filter: "brightness(1.45)" },
+          { filter: "brightness(1)" },
+        ],
+        { duration: 260, easing: "ease-out" },
+      );
+    }
   }
 
   function renderBlockGame() {
@@ -1061,15 +1152,16 @@
       return;
     }
 
-    // An empty hold slot draws a replacement; later holds swap the two shapes.
-    blockPieces[pieceIndex] = blockHeldShape === null
-      ? randomBlockShape()
-      : blockHeldShape;
+    // An empty hold slot leaves this tray slot empty; the tray refills when all three slots are empty.
+    blockPieces[pieceIndex] = blockHeldShape;
     blockHeldShape = shapeIndex;
     blockHoldUsedThisTurn = true;
     blockHoldArmed = false;
     blockSelectedPiece = -1;
     blockRun.usedHold = true;
+    if (blockPieces.every((piece) => piece === null)) {
+      refillBlockPieces();
+    }
     blockStatusElement.textContent = "Shape stored. Place a block to use hold again.";
     checkBlockAchievements();
     if (!anyBlockShapeFits()) {
@@ -1122,7 +1214,10 @@
       .filter((columnIndex) => blockBoard.every((row) => row[columnIndex]));
     const clearedLineCount = fullRows.length + fullColumns.length;
 
-    const boardCleared = clearedLineCount > 0 && blockBoard.every(row => row.every(v => v === 0));
+    if (clearedLineCount > 0) {
+      renderBlockBoard();
+      animateBlockClears(fullRows, fullColumns);
+    }
 
     if (clearedLineCount > 0) {
       // Snapshot complete lines before clearing so row/column intersections score only once.
@@ -1151,6 +1246,7 @@
       }
     }
 
+    const boardCleared = clearedLineCount > 0 && blockBoard.every(row => row.every(value => value === 0));
     let linePoints = 0;
     if (clearedLineCount === 1) {
       linePoints = 10 * blockCombo;
@@ -1170,7 +1266,7 @@
       const shapeW = Math.max(...shape.map(([, dc]) => dc)) + 1;
       const cx = rect.left + (left + shapeW / 2) * cellSize;
       const cy = rect.top + (top + shapeH / 2) * cellSize;
-      spawnFloatingPoints(cx, cy, pointsGained, clearedLineCount > 0);
+      spawnFloatingPoints(cx, cy, pointsGained);
     }
 
     if (blockPieces.every((shapeItem) => shapeItem === null)) {
@@ -1193,6 +1289,7 @@
     }
 
     renderBlockGame();
+    animateBlockPlacement(shape, top, left, clearedLineCount);
     return true;
   }
 
@@ -1826,6 +1923,18 @@
       wordGrid.classList.remove("is-shaking");
       void wordGrid.offsetWidth;
       wordGrid.classList.add("is-shaking");
+      if (!motionIsReduced() && typeof wordGrid.animate === "function") {
+        wordGrid.animate(
+          [
+            { transform: "translateX(0)" },
+            { transform: "translateX(-7px)" },
+            { transform: "translateX(6px)" },
+            { transform: "translateX(-4px)" },
+            { transform: "translateX(0)" },
+          ],
+          { duration: 280, easing: "ease-out" },
+        );
+      }
       return;
     }
 
@@ -1854,13 +1963,47 @@
     }
 
     persistWordGame();
-    renderWordGame();
+    renderWordGame(wordGuesses.length - 1);
+    animateWordGuessRow(wordGuesses.length - 1);
     if (wordArchiveDialog.open) {
       renderWordArchive();
     }
   }
 
-  function renderWordGame() {
+  function animateWordGuessRow(rowIndex) {
+    if (motionIsReduced() || typeof Element.prototype.animate !== "function") return;
+    const row = wordGrid.children[rowIndex];
+    if (!row) return;
+    Array.from(row.children).forEach((cell, index) => {
+      const state = cell.dataset.revealState;
+      if (!state) return;
+      const base = getComputedStyle(cell);
+      const baseBackground = base.backgroundColor;
+      const baseColor = base.color;
+      cell.classList.add(state);
+      const target = getComputedStyle(cell);
+      const targetBackground = target.backgroundColor;
+      const targetColor = target.color;
+      cell.classList.remove(state);
+
+      const animation = cell.animate(
+        [
+          { transform: "perspective(600px) rotateX(0deg)", backgroundColor: baseBackground, color: baseColor },
+          { transform: "perspective(600px) rotateX(88deg)", backgroundColor: baseBackground, color: baseColor, offset: 0.49 },
+          { transform: "perspective(600px) rotateX(88deg)", backgroundColor: targetBackground, color: targetColor, offset: 0.5 },
+          { transform: "perspective(600px) rotateX(0deg)", backgroundColor: targetBackground, color: targetColor },
+        ],
+        { duration: 500, delay: index * 105, easing: "ease-in-out", fill: "forwards" },
+      );
+      animation.onfinish = () => {
+        cell.classList.add(state);
+        delete cell.dataset.revealState;
+        animation.cancel();
+      };
+    });
+  }
+
+  function renderWordGame(revealRowIndex = -1) {
     wordGrid.replaceChildren();
     const greenHints = Array(wordLength).fill("");
     wordGuesses.forEach((entry) => {
@@ -1882,7 +2025,12 @@
         cell.setAttribute("role", "gridcell");
         if (entry) {
           cell.textContent = entry.word[column];
-          cell.classList.add(entry.states[column]);
+          if (rowIndex === revealRowIndex) {
+            cell.dataset.revealState = entry.states[column];
+            cell.classList.add("is-revealing");
+          } else {
+            cell.classList.add(entry.states[column]);
+          }
         } else if (rowIndex === wordGuesses.length && !wordFinished) {
           const typedLetter = wordCurrentGuess[column];
           const placeholder = wordPlaceholders.checked ? greenHints[column] : "";
