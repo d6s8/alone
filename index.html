@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#151515" />
+    <title>30.11.26</title>
+    <link rel="stylesheet" href="style.css?v=9" />
+    <script src="script.js?v=8" defer></script>
+    <script src="games.js?v=5" defer></script>
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="wordmark" href="#top" aria-label="alone, back to top">alone<span>★</span></a>
+        <span class="topbar-note">personal corner of the internet</span>
+        <span class="availability"><i aria-hidden="true"></i> around sometimes</span>
+      </header>
+
+      <main id="top">
+        <section class="hero panel" aria-labelledby="hero-title">
+          <div class="hero-copy">
+            <p class="eyebrow"><span aria-hidden="true">##</span> welcome!</p>
+            <h1 id="hero-title">alone<span>.</span></h1>
+            <p class="hero-bio">
+              Quiet mornings, slow conversations, and a soft spot for places with warm light.
+              I like collecting small details that feel human — old films, thoughtful books,
+              and the kind of days that leave room for both stillness and curiosity.
+            </p>
+            <div class="hero-tags" aria-label="A few things about me">
+              <span>old films</span>
+              <span>thoughtful books</span>
+              <span>slow conversations</span>
+            </div>
+          </div>
+          <img class="hero-avatar" src="assets/images/avatar.jpg" alt="Profile illustration" />
+          <div class="hero-foot">
+            <span>hello, stranger.</span>
+            <a href="#projects">scroll to explore <span aria-hidden="true">↓</span></a>
+          </div>
+        </section>
+
+        <section class="section-block" aria-labelledby="projects-title">
+          <div class="section-heading">
+            <h2 id="projects-title"><span aria-hidden="true">##</span> what do i do?</h2>
+            <span class="section-count" id="project-count">03 projects</span>
+          </div>
+          <div class="project-grid">
+            <a
+              class="project-card project-card--olive"
+              href="https://github.com/d6s8/eco-ai-engineers-future-2027"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span class="project-title">ECO AI <span aria-hidden="true">↗</span></span>
+              <p>Researching the environmental impact of AI, data centers, and infrastructure.</p>
+              <span class="tag-row"><span>python</span><span>research</span><span>2027</span></span>
+            </a>
+            <a
+              class="project-card project-card--blue"
+              href="https://github.com/d6s8/MisaAnon-TG.BOT"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span class="project-title">MisaAnon-TG.BOT <span aria-hidden="true">↗</span></span>
+              <p>A Telegram bot project, built with Python.</p>
+              <span class="tag-row"><span>python</span><span>telegram</span><span>bot</span></span>
+            </a>
+            <a
+              class="project-card project-card--rose"
+              href="https://github.com/d6s8/JustNotes"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span class="project-title">JustNotes <span aria-hidden="true">↗</span></span>
+              <p>A simple desktop app for daily notes.</p>
+              <span class="tag-row"><span>typescript</span><span>desktop</span><span>notes</span></span>
+            </a>
+          </div>
+          <p class="project-status" id="project-status" aria-live="polite">Checking public GitHub projects…</p>
+          <a class="text-link" href="https://github.com/d6s8" target="_blank" rel="noreferrer">
+            more on github <span aria-hidden="true">↗</span>
+          </a>
+        </section>
+
+        <section class="section-block split-section" aria-labelledby="stack-title">
+          <div>
+            <div class="section-heading">
+              <h2 id="stack-title"><span aria-hidden="true">##</span> skills (and not only)</h2>
+            </div>
+            <p class="section-copy">
+              I make things with code, collect little ideas, and try to leave room for curiosity.
+            </p>
+            <div class="tag-row skill-tags" aria-label="Technology stack">
+              <span>typescript</span><span>html / css</span><span>node.js</span><span>python</span>
+            </div>
+          </div>
+          <section class="now-playing mini-panel" aria-labelledby="now-playing-title">
+            <div class="mini-panel-heading">
+              <h3 id="now-playing-title"><span aria-hidden="true">♫</span> currently playing</h3>
+              <span class="status-chip">demo</span>
+            </div>
+            <p class="track-title">Spotify isn't connected yet</p>
+            <p class="muted-copy">This space will show a live track when music integration is set up.</p>
+            <div class="track-progress" aria-hidden="true"><span></span></div>
+            <span class="tiny-note">live status · coming later</span>
+          </section>
+        </section>
+
+        <section class="section-block" aria-labelledby="games-title">
+          <div class="section-heading">
+            <h2 id="games-title"><span aria-hidden="true">##</span> minigames</h2>
+            <span class="section-count">pick your distraction</span>
+          </div>
+          <p class="section-copy game-section-copy">
+            tiny games for the part of your brain that said “just one round”.
+          </p>
+          <div class="game-cards" role="group" aria-label="Choose a minigame">
+            <button
+              type="button"
+              class="game-card game-card--blocks"
+              data-game-open="blocks"
+              aria-controls="game-blocks"
+              aria-expanded="false"
+            >
+              <span class="game-card-art block-card-art" aria-hidden="true">
+                <i></i><i class="is-lit"></i><i></i><i></i><i class="is-lit"></i>
+                <i></i><i class="is-lit"></i><i class="is-lit"></i><i></i><i></i>
+                <i class="is-lit"></i><i></i><i></i><i class="is-lit"></i><i></i>
+                <i></i><i></i><i class="is-lit"></i><i class="is-lit"></i><i></i>
+                <i class="is-lit"></i><i></i><i></i><i></i><i class="is-lit"></i>
+              </span>
+              <span class="game-card-copy">
+                <strong>blockblast</strong>
+                <span>fit shapes · clear lines · keep going</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              class="game-card game-card--word"
+              data-game-open="word"
+              aria-controls="game-word"
+              aria-expanded="false"
+            >
+              <span class="game-card-art word-card-art" aria-hidden="true">
+                <i>W</i><i>O</i><i class="is-present">R</i><i>D</i><i>L</i>
+                <i>G</i><i class="is-correct">U</i><i>E</i><i>S</i><i>S</i>
+              </span>
+              <span class="game-card-copy">
+                <strong>wordle</strong>
+                <span>one word · six tries · daily or endless</span>
+              </span>
+            </button>
+          </div>
+
+          <section class="game-panel" id="game-blocks" data-game-panel="blocks" aria-label="BlockBlast" tabindex="-1" hidden>
+            <div class="game-intro">
+              <div>
+                <h3>blockblast</h3>
+                <p>Drag a shape onto the board, or select it and tap a cell. Clear full rows and columns.</p>
+              </div>
+              <button type="button" class="small-button" data-game-close>close</button>
+            </div>
+            <div class="block-mode-tabs" role="tablist" aria-label="BlockBlast mode">
+              <button type="button" role="tab" class="block-mode-tab is-active" data-block-mode="classic" aria-selected="true">classic</button>
+              <button type="button" role="tab" class="block-mode-tab" data-block-mode="limited" aria-selected="false">50 moves</button>
+              <button type="button" role="tab" class="block-mode-tab" data-block-mode="big" aria-selected="false">10 × 10</button>
+              <button type="button" role="tab" class="block-mode-tab" data-block-mode="hold" aria-selected="false">hold</button>
+              <button type="button" role="tab" class="block-mode-tab" data-block-mode="daily" aria-selected="false">daily</button>
+            </div>
+            <div class="block-daily-header" id="block-daily-header" hidden>
+              <span>daily · <time id="block-daily-date"></time></span>
+              <span>ranked run</span>
+              <span>personal best <strong id="block-daily-best">0</strong></span>
+              <button type="button" class="small-button" id="block-leaderboard-open">leaderboard</button>
+              <p class="block-daily-status" id="block-daily-status" aria-live="polite"></p>
+            </div>
+            <dialog class="game-dialog block-leaderboard-dialog" id="block-leaderboard-dialog" aria-labelledby="block-leaderboard-title">
+              <div class="dialog-heading">
+                <h3 id="block-leaderboard-title">daily leaderboard</h3>
+                <form method="dialog"><button class="small-button" aria-label="Close leaderboard">close</button></form>
+              </div>
+              <p class="block-leaderboard-date" id="block-leaderboard-date"></p>
+              <p class="block-leaderboard-message" id="block-leaderboard-message" role="status" aria-live="polite">Loading scores…</p>
+              <ol class="block-leaderboard-list" id="block-leaderboard-list"></ol>
+            </dialog>
+            <div class="block-layout">
+              <div class="block-board" id="block-board" role="grid" aria-label="BlockBlast board"></div>
+              <div class="block-floating-scores" id="block-floating-scores" aria-hidden="true"></div>
+              <aside class="block-side">
+                <div class="block-score-row">
+                  <p class="score-label">score <strong id="block-score">0</strong></p>
+                  <p class="score-label">moves <strong id="block-moves">0</strong></p>
+                </div>
+                <div class="block-combo-row">
+                  <span class="combo-label">combo</span>
+                  <strong id="block-combo" class="combo-value">0</strong>
+                  <span id="block-combo-mult" class="combo-mult"></span>
+                </div>
+                <div class="block-hold-wrap" id="block-hold-wrap" hidden>
+                  <button type="button" class="block-hold" id="block-hold-button" aria-pressed="false">
+                    <span class="block-hold-preview" id="block-hold-preview"></span>
+                    <span id="block-hold-label">hold · choose a piece</span>
+                  </button>
+                </div>
+                <div class="block-pieces" id="block-pieces" role="toolbar" aria-label="Available shapes"></div>
+                <label class="game-option">
+                  <input type="checkbox" id="block-haptics" checked />
+                  <span>vibrate on clear</span>
+                </label>
+                <details class="block-achievements">
+                  <summary id="block-achievement-summary">achievements · 0/24</summary>
+                  <ol id="block-achievement-list"></ol>
+                </details>
+                <p class="game-status" id="block-status" aria-live="polite">Choose a shape to begin.</p>
+                <button type="button" class="small-button" id="blocks-reset">restart</button>
+              </aside>
+            </div>
+          </section>
+
+          <section class="game-panel word-game-panel" id="game-word" data-game-panel="word" aria-label="Wordle" tabindex="-1" hidden>
+            <div class="game-intro">
+              <div>
+                <h3>wordle</h3>
+                <p>Guess the hidden word in six tries. Green is exact; yellow is elsewhere.</p>
+              </div>
+              <button type="button" class="small-button" data-game-close>close</button>
+            </div>
+            <div class="word-toolbar">
+              <label>mode
+                <select id="word-mode">
+                  <option value="daily">daily</option>
+                  <option value="infinite">infinite</option>
+                </select>
+              </label>
+              <button type="button" class="small-button" id="word-past-toggle" aria-expanded="false">past</button>
+              <label>language
+                <select id="word-language">
+                  <option value="en">english</option>
+                  <option value="ru">russian</option>
+                </select>
+              </label>
+              <label>length
+                <select id="word-length">
+                  <option value="4">4 letters</option>
+                  <option value="5" selected>5 letters</option>
+                  <option value="6">6 letters</option>
+                  <option value="7">7 letters</option>
+                </select>
+              </label>
+              <button type="button" class="small-button" id="word-new-game">new game</button>
+              <button type="button" class="small-button" id="word-stats-open">stats</button>
+              <button type="button" class="small-button" id="word-options-toggle" aria-expanded="false" aria-controls="word-options">options</button>
+            </div>
+            <p class="word-puzzle-meta" id="word-puzzle-meta" aria-live="polite"></p>
+            <div class="word-grid" id="word-grid" role="grid" aria-label="Wordle guess grid"></div>
+            <p class="game-status word-status" id="word-status" aria-live="polite">Ready when you are.</p>
+            <div class="word-keyboard" id="word-keyboard" role="group" aria-label="On-screen keyboard"></div>
+            <div class="word-options" id="word-options" hidden>
+              <label class="game-option">
+                <input type="checkbox" id="word-colorblind-hints" />
+                <span>colorblind hints · add stripes to yellow tiles</span>
+              </label>
+              <label class="game-option">
+                <input type="checkbox" id="word-swap-keys" />
+                <span>swap enter and backspace</span>
+              </label>
+              <label class="game-option">
+                <input type="checkbox" id="word-placeholders" />
+                <span>show known green letters while typing</span>
+              </label>
+              <button type="button" class="small-button" id="word-reset-stats">reset all stats</button>
+            </div>
+            <dialog class="game-dialog word-archive-dialog" id="word-archive-dialog" aria-labelledby="word-archive-title">
+              <div class="dialog-heading">
+                <h3 id="word-archive-title">past dailies</h3>
+                <form method="dialog"><button class="small-button" aria-label="Close archive">close</button></form>
+              </div>
+              <p class="word-archive-note">Past daily puzzles stay playable. Replaying one will not change your stats.</p>
+              <div class="word-archive-list" id="word-archive-list"></div>
+            </dialog>
+            <dialog class="game-dialog" id="word-stats-dialog" aria-labelledby="word-stats-title">
+              <div class="dialog-heading">
+                <h3 id="word-stats-title">your stats</h3>
+                <form method="dialog"><button class="small-button" aria-label="Close stats">close</button></form>
+              </div>
+              <div class="word-stats" id="word-stats"></div>
+            </dialog>
+          </section>
+        </section>
+
+        <section class="section-block" aria-labelledby="guestbook-title">
+          <div class="section-heading">
+            <h2 id="guestbook-title"><span aria-hidden="true">##</span> the wall</h2>
+            <span class="section-count" id="guestbook-mode">connecting…</span>
+          </div>
+          <p class="section-copy" id="guestbook-notice">Connecting to the guestbook…</p>
+          <form class="guestbook-form mini-panel" id="guestbook-form">
+            <label>
+              <span>name <span class="muted-copy">(optional)</span></span>
+              <input name="name" maxlength="24" autocomplete="nickname" placeholder="anonymous" />
+            </label>
+            <label>
+              <span>message</span>
+              <textarea name="message" rows="3" maxlength="240" required placeholder="say something kind…"></textarea>
+            </label>
+            <div class="form-footer">
+              <p class="game-status" id="guestbook-status" aria-live="polite">up to 240 characters</p>
+              <button type="submit" class="action-button">post note <span aria-hidden="true">↗</span></button>
+            </div>
+          </form>
+          <div class="wall-list" id="wall-list" aria-live="polite"></div>
+        </section>
+
+        <section class="section-block" aria-labelledby="donations-title">
+          <div class="section-heading">
+            <h2 id="donations-title"><span aria-hidden="true">##</span> support</h2>
+            <span class="section-count">optional, always appreciated</span>
+          </div>
+          <div class="support-grid">
+            <div class="support-card">
+              <span class="support-icon" aria-hidden="true">♡</span>
+              <strong>buy me a tea</strong>
+              <span class="coming-soon">link coming soon</span>
+            </div>
+            <div class="support-card">
+              <span class="support-icon" aria-hidden="true">✦</span>
+              <strong>support a project</strong>
+              <span class="coming-soon">link coming soon</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-block" aria-labelledby="contact-title">
+          <div class="section-heading">
+            <h2 id="contact-title"><span aria-hidden="true">##</span> say hello</h2>
+          </div>
+          <div class="contact-grid">
+            <a href="https://t.me/@d2s16q" target="_blank" rel="noreferrer">telegram <span>↗</span></a>
+            <a href="https://t.me/MisaCries" target="_blank" rel="noreferrer">telegram channel <span>↗</span></a>
+            <a href="mailto:d2s.18q@gmail.com">email <span>↗</span></a>
+            <a href="https://github.com/d6s8" target="_blank" rel="noreferrer">github <span>↗</span></a>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <span>i'm sorry guys.</span>
+        <span>but i cant take it anymore.</span>
+        <span class="footer-mark">built with care · 2026</span>
+      </footer>
+    </div>
+  </body>
+</html>
