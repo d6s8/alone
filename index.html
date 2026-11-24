@@ -6,8 +6,20 @@
     <meta name="theme-color" content="#151515" />
     <title>30.11.26</title>
     <link rel="stylesheet" href="style.css?v=9" />
+    <link rel="stylesheet" href="tools/blockblast/styles.css?v=2" />
+    <link rel="stylesheet" href="tools/wordle/styles.css?v=2" />
+    <link rel="stylesheet" href="tools/game2048/styles.css?v=2" />
+    <link rel="stylesheet" href="tools/typing/styles.css?v=2" />
     <script src="script.js?v=8" defer></script>
-    <script src="games.js?v=5" defer></script>
+    <script src="tools/ui.js?v=1" defer></script>
+    <script src="tools/blockblast/mechanics.js?v=1" defer></script>
+    <script src="tools/blockblast/game.js?v=3" defer></script>
+    <script src="tools/wordle/mechanics.js?v=2" defer></script>
+    <script src="tools/wordle/game.js?v=3" defer></script>
+    <script src="tools/game2048/mechanics.js?v=2" defer></script>
+    <script src="tools/game2048/game.js?v=2" defer></script>
+    <script src="tools/typing/mechanics.js?v=3" defer></script>
+    <script src="tools/typing/game.js?v=2" defer></script>
   </head>
   <body>
     <div class="site-shell">
@@ -28,14 +40,14 @@
               and the kind of days that leave room for both stillness and curiosity.
             </p>
             <div class="hero-tags" aria-label="A few things about me">
-              <span>old films</span>
-              <span>thoughtful books</span>
-              <span>slow conversations</span>
+              <span>coding</span>
+              <span>psychology</span>
+              <span>music</span>
             </div>
           </div>
           <img class="hero-avatar" src="assets/images/avatar.jpg" alt="Profile illustration" />
           <div class="hero-foot">
-            <span>hello, stranger.</span>
+            <span> ^_^ </span>
             <a href="#projects">scroll to explore <span aria-hidden="true">↓</span></a>
           </div>
         </section>
@@ -43,7 +55,7 @@
         <section class="section-block" aria-labelledby="projects-title">
           <div class="section-heading">
             <h2 id="projects-title"><span aria-hidden="true">##</span> what do i do?</h2>
-            <span class="section-count" id="project-count">03 projects</span>
+            <span class="section-count" id="project-count">04 projects</span>
           </div>
           <div class="project-grid">
             <a
@@ -86,7 +98,7 @@
         <section class="section-block split-section" aria-labelledby="stack-title">
           <div>
             <div class="section-heading">
-              <h2 id="stack-title"><span aria-hidden="true">##</span> skills (and not only)</h2>
+              <h2 id="stack-title"><span aria-hidden="true">##</span> skills </h2>
             </div>
             <p class="section-copy">
               I make things with code, collect little ideas, and try to leave room for curiosity.
@@ -149,6 +161,37 @@
               <span class="game-card-copy">
                 <strong>wordle</strong>
                 <span>one word · six tries · daily or endless</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              class="game-card game-card--numbers"
+              data-game-open="game2048"
+              aria-controls="game-2048"
+              aria-expanded="false"
+            >
+              <span class="game-card-art nb-art" aria-hidden="true">
+                <i></i><i class="nb-tile nb-tile--4">2</i><i class="nb-tile nb-tile--8">4</i><i></i>
+                <i class="nb-tile nb-tile--8">8</i><i></i><i class="nb-tile nb-tile--16">16</i><i></i>
+              </span>
+              <span class="game-card-copy">
+                <strong>2048</strong>
+                <span>slide tiles · merge doubles · reach 2048</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              class="game-card game-card--words typing-card"
+              data-game-open="typing"
+              aria-controls="game-typing"
+              aria-expanded="false"
+            >
+              <span class="game-card-art typing-art" aria-hidden="true">
+                <i>t</i><i>y</i><i>p</i><i>e</i><i>r</i><i>…</i><i>i</i><i>t</i>
+              </span>
+              <span class="game-card-copy">
+                <strong>typing test</strong>
+                <span>type words · track speed &amp; accuracy</span>
               </span>
             </button>
           </div>
@@ -217,6 +260,14 @@
               </aside>
             </div>
           </section>
+
+          <dialog class="game-dialog block-gameover" id="block-gameover" aria-labelledby="block-gameover-title">
+            <div class="dialog-heading">
+              <h3 id="block-gameover-title">game over</h3>
+              <form method="dialog"><button class="small-button" aria-label="Close">ok</button></form>
+            </div>
+            <p class="block-gameover-score"><strong id="block-gameover-score">0</strong></p>
+          </dialog>
 
           <section class="game-panel word-game-panel" id="game-word" data-game-panel="word" aria-label="Wordle" tabindex="-1" hidden>
             <div class="game-intro">
@@ -287,6 +338,57 @@
               <div class="word-stats" id="word-stats"></div>
             </dialog>
           </section>
+
+          <section class="game-panel nb-panel" id="game-2048" data-game-panel="game2048" aria-label="2048" tabindex="-1" hidden>
+            <div class="game-intro">
+              <div>
+                <h3>2048</h3>
+                <p>Slide tiles with the arrow keys or swipe. Equal tiles merge and add up.</p>
+              </div>
+              <button type="button" class="small-button" data-game-close>close</button>
+            </div>
+            <div class="nb-row">
+              <p class="score-label">score <strong id="nb-score">0</strong></p>
+              <p class="score-label">best <strong id="nb-best">0</strong></p>
+            </div>
+            <div class="nb-grid" id="nb-board" role="grid" aria-label="2048 board"></div>
+            <div class="nb-side">
+              <button type="button" class="small-button" id="nb-new-game">new game</button>
+            </div>
+            <p class="game-status nb-status" id="nb-status" aria-live="polite">Arrow keys or swipe.</p>
+            <div class="nb-gameover" id="nb-gameover" role="status" hidden>
+              <p class="nb-gameover-title">game over</p>
+              <p class="nb-gameover-score">final score <strong id="nb-gameover-score">0</strong></p>
+            </div>
+          </section>
+
+          <section class="game-panel typing-panel" id="game-typing" data-game-panel="typing" aria-label="Typing test" tabindex="-1" hidden>
+            <div class="game-intro">
+              <div>
+                <h3>typing test</h3>
+                <p>Type the text as fast as you can. Speed and accuracy are tracked.</p>
+              </div>
+              <button type="button" class="small-button" data-game-close>close</button>
+            </div>
+            <div class="typing-board">
+              <div class="tt-line" id="tt-target" role="textbox" aria-live="polite"></div>
+              <textarea id="tt-input" class="typing-input" rows="3" aria-label="Type the text" spellcheck="false" autocomplete="off"></textarea>
+              <div class="typing-stats" id="tt-stats"></div>
+              <p class="game-status typing-status" id="tt-status" aria-live="polite"></p>
+            </div>
+            <div class="typing-side">
+              <button type="button" class="small-button" id="tt-new">new test</button>
+              <button type="button" class="small-button" id="tt-reset-stats">reset stats</button>
+              <button type="button" class="small-button" id="tt-stats-open">stats</button>
+            </div>
+            <dialog class="game-dialog" id="tt-stats-dialog" aria-labelledby="tt-stats-title">
+              <div class="dialog-heading">
+                <h3 id="tt-stats-title">typing test stats</h3>
+                <form method="dialog"><button class="small-button" aria-label="Close stats">close</button></form>
+              </div>
+              <div class="word-stats-body" id="tt-stats-body"></div>
+            </dialog>
+          </section>
         </section>
 
         <section class="section-block" aria-labelledby="guestbook-title">
@@ -297,11 +399,7 @@
           <p class="section-copy" id="guestbook-notice">Connecting to the guestbook…</p>
           <form class="guestbook-form mini-panel" id="guestbook-form">
             <label>
-              <span>name <span class="muted-copy">(optional)</span></span>
-              <input name="name" maxlength="24" autocomplete="nickname" placeholder="anonymous" />
-            </label>
-            <label>
-              <span>message</span>
+              <span> message </span>
               <textarea name="message" rows="3" maxlength="240" required placeholder="say something kind…"></textarea>
             </label>
             <div class="form-footer">

@@ -1,0 +1,106 @@
+/* Typing test (monkeytype-like) styles */
+
+.typing-board {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.tt-line {
+  display: flex;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text);
+  min-height: 2.4em;
+}
+
+.tt-char {
+  display: inline-block;
+  white-space: pre;
+}
+
+.tt-char.is-correct {
+  color: var(--green);
+}
+
+.tt-char.is-error {
+  color: #d64b4b;
+  text-decoration: underline wavy;
+}
+
+.tt-char.is-rest {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.tt-cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 0.85em;
+  margin-left: 0.12em;
+  border-left: 2px solid var(--text);
+  animation: tt-cursor-blink 1s steps(1) infinite;
+}
+
+@keyframes tt-cursor-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.typing-input {
+  width: 100%;
+  min-width: 220px;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  font-family: var(--mono);
+  font-size: 15px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  outline: none;
+}
+
+.typing-input:focus {
+  border-color: var(--orange);
+}
+
+.typing-stats {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.typing-status {
+  color: var(--muted);
+}
+
+.typing-side {
+  margin-top: 10px;
+}
+
+.word-stats-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.word-stats-body strong {
+  font-size: 16px;
+}
+
+@media (max-width: 700px) {
+  .tt-line {
+    font-size: 17px;
+  }
+  .typing-input {
+    min-width: 0;
+    padding: 8px 10px;
+  }
+}
