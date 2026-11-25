@@ -4,6 +4,7 @@
 .vercel/
 .vscode/
 .api
-
+node_modules/
+*.log
 
 .updates

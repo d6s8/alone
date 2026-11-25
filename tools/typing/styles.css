@@ -1,5 +1,39 @@
 /* Typing test (monkeytype-like) styles */
 
+.typing-art {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  height: 30px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  opacity: 0.8;
+}
+
+.typing-art i {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+  color: var(--text);
+}
+
+.typing-art i.is-present {
+  background: rgba(138, 200, 181, 0.45);
+  color: var(--text);
+}
+
+.typing-art i.is-correct {
+  background: var(--green);
+  color: var(--page);
+}
+
 .typing-board {
   display: flex;
   flex-direction: column;
