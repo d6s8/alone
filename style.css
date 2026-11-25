@@ -580,6 +580,33 @@ button {
   resize: vertical;
 }
 
+.guestbook-toolbar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.toolbar-button {
+  padding: 3px 7px;
+  font-size: 11px;
+  font-family: var(--mono);
+  font-weight: 700;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 80ms ease, border-color 80ms ease;
+}
+
+.toolbar-button:hover {
+  border-color: var(--orange);
+}
+
+.toolbar-button:active {
+  background: rgba(231, 173, 107, 0.12);
+}
+
 .form-footer {
   display: flex;
   align-items: center;

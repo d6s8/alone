@@ -93,9 +93,69 @@ const guestbookForm = document.getElementById("guestbook-form");
 const guestbookStatus = document.getElementById("guestbook-status");
 const guestbookNotice = document.getElementById("guestbook-notice");
 const guestbookModeLabel = document.getElementById("guestbook-mode");
+const guestbookMessage = guestbookForm.querySelector("textarea[name='message']");
 const wallList = document.getElementById("wall-list");
 const guestbookKey = "alone.local-wall.v1";
 let guestbookMode = "connecting";
+
+// The message is stored with simple markers so the toolbar can add styling to text.
+const formatMarkers = {
+  bold: ["**", "**"],
+  italic: ["*", "*"],
+  underline: ["__", "__"],
+  strike: ["~~", "~~"],
+};
+
+function escapeWallText(text) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function formatWallText(text) {
+  return escapeWallText(text)
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/__(.+?)__/g, "<u>$1</u>")
+    .replace(/~~(.+?)~~/g, "<s>$1</s>")
+    .replace(/\*(.+?)\*/g, "<em>$1</em>");
+}
+
+function applyFormatting(formatName) {
+  const markers = formatMarkers[formatName];
+  if (!markers || !guestbookMessage) return;
+
+  const [openMarker, closeMarker] = markers;
+  const value = guestbookMessage.value;
+  const start = guestbookMessage.selectionStart;
+  const end = guestbookMessage.selectionEnd;
+
+  // Unwrap when the selection is already wrapped with the same markers.
+  const wrapped = value.slice(start - openMarker.length, start) === openMarker &&
+    value.slice(end, end + closeMarker.length) === closeMarker;
+  if (wrapped) {
+    const inner = value.slice(start, end);
+    guestbookMessage.setRangeText(inner, start - openMarker.length, end + closeMarker.length, "select");
+  } else {
+    const selected = value.slice(start, end);
+    const replacement = selected === ""
+      ? openMarker + closeMarker
+      : openMarker + selected + closeMarker;
+    guestbookMessage.setRangeText(replacement, start, end, "end");
+  }
+  guestbookMessage.focus();
+}
+
+guestbookForm.querySelectorAll("[data-format]").forEach((button) => {
+  button.addEventListener("click", () => {
+    applyFormatting(button.dataset.format);
+    if (guestbookStatus.textContent.startsWith("Saved")) {
+      guestbookStatus.textContent = "";
+    }
+  });
+});
 
 function isLocalPreview() {
   return location.protocol === "file:" ||
@@ -150,7 +210,7 @@ function renderGuestbookEntries(entries, emptyMessage) {
     heading.append(author, date);
 
     const message = document.createElement("p");
-    message.textContent = entry.message;
+    message.innerHTML = formatWallText(entry.message);
     article.append(heading, message);
     wallList.append(article);
   });

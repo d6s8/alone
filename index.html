@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="tools/wordle/styles.css?v=2" />
     <link rel="stylesheet" href="tools/game2048/styles.css?v=2" />
     <link rel="stylesheet" href="tools/typing/styles.css?v=3" />
-    <script src="script.js?v=8" defer></script>
+    <script src="script.js?v=9" defer></script>
     <script src="tools/ui.js?v=1" defer></script>
     <script src="tools/blockblast/mechanics.js?v=1" defer></script>
     <script src="tools/blockblast/game.js?v=3" defer></script>
@@ -26,7 +26,7 @@
       <header class="topbar">
         <a class="wordmark" href="#top" aria-label="alone, back to top">alone<span>★</span></a>
         <span class="topbar-note">Idk. I was bored :D</span>
-        <span class="availability"><i aria-hidden="true"></i> still alive</span>
+        <span class="availability"><i aria-hidden="true"></i>online</span>
       </header>
 
       <main id="top">
@@ -53,7 +53,7 @@
         <section class="section-block" aria-labelledby="projects-title">
           <div class="section-heading">
             <h2 id="projects-title"><span aria-hidden="true">##</span> what do i do?</h2>
-            <span class="section-count" id="project-count">04 projects</span>
+            <span class="section-count" id="project-count">03 projects</span>
           </div>
           <div class="project-grid">
             <a
@@ -400,6 +400,12 @@
               <span> message </span>
               <textarea name="message" rows="3" maxlength="240" required placeholder="say something kind…"></textarea>
             </label>
+            <div class="guestbook-toolbar" role="toolbar" aria-label="Message formatting">
+              <button type="button" class="toolbar-button" data-format="bold" aria-label="Bold"><b>B</b></button>
+              <button type="button" class="toolbar-button" data-format="italic" aria-label="Italic"><i>I</i></button>
+              <button type="button" class="toolbar-button" data-format="underline" aria-label="Underline"><u>U</u></button>
+              <button type="button" class="toolbar-button" data-format="strike" aria-label="Strikethrough"><s>S</s></button>
+            </div>
             <div class="form-footer">
               <p class="game-status" id="guestbook-status" aria-live="polite">up to 240 characters</p>
               <button type="submit" class="action-button">post note <span aria-hidden="true">↗</span></button>
