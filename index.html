@@ -396,6 +396,12 @@
           </div>
           <p class="section-copy" id="guestbook-notice">Connecting to the guestbook…</p>
           <form class="guestbook-form mini-panel" id="guestbook-form">
+            <div class="guestbook-toolbar" role="toolbar" aria-label="Message formatting">
+              <button type="button" class="toolbar-button" data-format="bold" aria-label="Bold"><b>B</b></button>
+              <button type="button" class="toolbar-button" data-format="italic" aria-label="Italic"><i>I</i></button>
+              <button type="button" class="toolbar-button" data-format="underline" aria-label="Underline"><u>U</u></button>
+              <button type="button" class="toolbar-button" data-format="strike" aria-label="Strikethrough"><s>S</s></button>
+            </div>
             <textarea
               id="guestbook-message"
               name="message"
@@ -405,12 +411,6 @@
               placeholder="say something kind…"
               aria-label="Message"
             ></textarea>
-            <div class="guestbook-toolbar" role="toolbar" aria-label="Message formatting">
-              <button type="button" class="toolbar-button" data-format="bold" aria-label="Bold"><b>B</b></button>
-              <button type="button" class="toolbar-button" data-format="italic" aria-label="Italic"><i>I</i></button>
-              <button type="button" class="toolbar-button" data-format="underline" aria-label="Underline"><u>U</u></button>
-              <button type="button" class="toolbar-button" data-format="strike" aria-label="Strikethrough"><s>S</s></button>
-            </div>
             <div class="form-footer">
               <p class="game-status" id="guestbook-status" aria-live="polite">up to 240 characters</p>
               <button type="submit" class="action-button">post note <span aria-hidden="true">↗</span></button>
