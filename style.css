@@ -566,35 +566,31 @@ button {
 
 .guestbook-form {
   display: grid;
-  gap: 11px;
-}
-
-.guestbook-form label {
-  display: grid;
-  gap: 5px;
-  color: var(--muted);
-  font-size: 10px;
+  gap: 9px;
 }
 
 .guestbook-form textarea {
   resize: vertical;
+  width: 100%;
 }
 
 .guestbook-toolbar {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   align-items: center;
+  justify-content: flex-end;
 }
 
 .toolbar-button {
-  padding: 3px 7px;
-  font-size: 11px;
+  padding: 2px 6px;
+  font-size: 9px;
+  line-height: 1;
   font-family: var(--mono);
   font-weight: 700;
   border: 1px solid var(--line);
   background: var(--surface);
   color: var(--text);
-  border-radius: 3px;
+  border-radius: 2px;
   cursor: pointer;
   transition: background 80ms ease, border-color 80ms ease;
 }

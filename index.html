@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#151515" />
     <title>30.11.26</title>
-    <link rel="stylesheet" href="style.css?v=9" />
+    <link rel="stylesheet" href="style.css?v=10" />
     <link rel="stylesheet" href="tools/blockblast/styles.css?v=2" />
     <link rel="stylesheet" href="tools/wordle/styles.css?v=2" />
     <link rel="stylesheet" href="tools/game2048/styles.css?v=2" />
@@ -396,10 +396,15 @@
           </div>
           <p class="section-copy" id="guestbook-notice">Connecting to the guestbook…</p>
           <form class="guestbook-form mini-panel" id="guestbook-form">
-            <label>
-              <span> message </span>
-              <textarea name="message" rows="3" maxlength="240" required placeholder="say something kind…"></textarea>
-            </label>
+            <textarea
+              id="guestbook-message"
+              name="message"
+              rows="3"
+              maxlength="240"
+              required
+              placeholder="say something kind…"
+              aria-label="Message"
+            ></textarea>
             <div class="guestbook-toolbar" role="toolbar" aria-label="Message formatting">
               <button type="button" class="toolbar-button" data-format="bold" aria-label="Bold"><b>B</b></button>
               <button type="button" class="toolbar-button" data-format="italic" aria-label="Italic"><i>I</i></button>
