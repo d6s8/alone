@@ -3,6 +3,33 @@
 (() => {
   const gameCards = Array.from(document.querySelectorAll("[data-game-open]"));
   const gamePanels = Array.from(document.querySelectorAll("[data-game-panel]"));
+  const gameFolders = { blocks: "blockblast", word: "wordle", "2048": "2048", typing: "typing" };
+  const loadedGames = new Map();
+  // The build replaces this empty map with content hashes; source preview needs no build.
+  const assetVersions = /* ASSET_VERSIONS */ {};
+  let latestGameRequest = 0;
+
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = assetVersions[src] ? `${src}?v=${assetVersions[src]}` : src;
+      script.onload = resolve;
+      script.onerror = () => { script.remove(); reject(new Error(`Could not load ${src}`)); };
+      document.head.append(script);
+    });
+  }
+
+  function loadGame(name) {
+    if (!loadedGames.has(name)) {
+      const folder = gameFolders[name];
+      const loading = loadScript(`tools/${folder}/mechanics.js`)
+        .then(() => name === "blocks" ? loadScript("tools/blockblast/achievements.js") : undefined)
+        .then(() => loadScript(`tools/${folder}/game.js`))
+        .catch((error) => { loadedGames.delete(name); throw error; });
+      loadedGames.set(name, loading);
+    }
+    return loadedGames.get(name);
+  }
 
   function openGame(name) {
     gameCards.forEach((card) => {
@@ -31,12 +58,22 @@
   }
 
   gameCards.forEach((card) => {
-    card.addEventListener("click", () => {
+    card.addEventListener("click", async () => {
+      const request = ++latestGameRequest;
       const panel = document.querySelector(`[data-game-panel="${card.dataset.gameOpen}"]`);
       if (panel && !panel.hidden) {
         closeGame(panel);
       } else {
-        openGame(card.dataset.gameOpen);
+        card.disabled = true;
+        try {
+          await loadGame(card.dataset.gameOpen);
+          if (request === latestGameRequest) openGame(card.dataset.gameOpen);
+        } catch (error) {
+          console.error(error);
+          window.alert("The game could not be loaded. Please try again.");
+        } finally {
+          card.disabled = false;
+        }
       }
     });
   });

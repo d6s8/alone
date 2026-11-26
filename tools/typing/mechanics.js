@@ -29,7 +29,7 @@
     for (let i = 0; i < limit; i++) {
       if (typed[i] === target[i]) correct += 1;
     }
-    return Math.round((correct / Math.max(target.length, 1)) * 100);
+    return typed.length ? Math.round((correct / typed.length) * 100) : 100;
   }
 
   function elapsedSeconds(startedAt) {

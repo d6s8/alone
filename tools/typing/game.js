@@ -16,6 +16,7 @@
   let typed = "";
   let startTime = null;
   let finished = false;
+  let duration = 0;
   let stats = readStats();
 
   function defaultStats() {
@@ -51,22 +52,23 @@
     typed = "";
     startTime = null;
     finished = false;
+    duration = 0;
+    inputEl.value = "";
+    inputEl.disabled = false;
+    inputEl.maxLength = target.length;
     renderTarget();
     renderStats();
-    inputEl.value = "";
-    inputEl.focus();
   }
 
   function renderTarget() {
     let html = "";
     const n = finished ? target.length : Math.min(typed.length, target.length);
-    for (let i = 0; i < n; i++) {
-      const ok = typed[i] === target[i];
-      html += `<span class="tt-char ${ok ? "is-correct" : "is-error"}">${escapeHtml(target[i])}</span>`;
-    }
-    if (!finished && typed.length < target.length) html += '<span class="tt-cursor">_</span>';
-    for (let i = n; i < target.length; i++) {
-      html += `<span class="tt-char is-rest">${escapeHtml(target[i])}</span>`;
+    const cursor = finished ? -1 : Math.min(inputEl.selectionStart, target.length);
+    for (let i = 0; i <= target.length; i++) {
+      if (i === cursor) html += '<span class="tt-cursor" aria-hidden="true"></span>';
+      if (i === target.length) break;
+      const state = i >= n ? "is-rest" : typed[i] === target[i] ? "is-correct" : "is-error";
+      html += `<span class="tt-char ${state}">${escapeHtml(target[i])}</span>`;
     }
     targetEl.innerHTML = html;
   }
@@ -82,8 +84,7 @@
 
   function renderStats() {
     if (finished && startTime) {
-      const seconds = M.elapsedSeconds(startTime);
-      statusEl.textContent = `${stats.lastWpm} wpm · ${stats.lastAccuracy}% accuracy · ${Math.round(seconds)}s`;
+      statusEl.textContent = `${stats.lastWpm} wpm · ${stats.lastAccuracy}% accuracy · ${Math.round(duration)}s`;
     } else {
       statusEl.textContent = `live ${liveWpm()} wpm · ${liveAccuracy()}%`;
     }
@@ -91,6 +92,7 @@
   }
 
   function onInput() {
+    if (finished) return;
     typed = inputEl.value;
     if (startTime === null && typed.length > 0) startTime = Date.now();
     renderTarget();
@@ -101,7 +103,9 @@
   function finishTest() {
     if (finished) return;
     finished = true;
-    const rawWpm = M.computeWpm(typed.length, M.elapsedSeconds(startTime));
+    duration = M.elapsedSeconds(startTime);
+    inputEl.disabled = true;
+    const rawWpm = M.computeWpm(typed.length, duration);
     const wpm = Math.min(rawWpm, 999);
     const accuracy = M.computeAccuracy(typed, target);
     stats.tests += 1;
@@ -144,8 +148,11 @@
   }
 
   inputEl.addEventListener("input", onInput);
+  inputEl.addEventListener("click", renderTarget);
+  inputEl.addEventListener("keyup", renderTarget);
   newTestBtn.addEventListener("click", () => {
     startTest();
+    inputEl.focus();
     statusEl.textContent = "Type the text.";
   });
   resetStatsBtn.addEventListener("click", resetStats);

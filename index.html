@@ -8,18 +8,11 @@
     <link rel="stylesheet" href="style.css?v=11" />
     <link rel="stylesheet" href="tools/blockblast/styles.css?v=2" />
     <link rel="stylesheet" href="tools/wordle/styles.css?v=2" />
-    <link rel="stylesheet" href="tools/game2048/styles.css?v=2" />
+    <link rel="stylesheet" href="tools/2048/styles.css?v=2" />
     <link rel="stylesheet" href="tools/typing/styles.css?v=3" />
-    <script src="script.js?v=9" defer></script>
+    <script src="projects.js" defer></script>
+    <script src="guestbook.js" defer></script>
     <script src="tools/ui.js?v=1" defer></script>
-    <script src="tools/blockblast/mechanics.js?v=1" defer></script>
-    <script src="tools/blockblast/game.js?v=3" defer></script>
-    <script src="tools/wordle/mechanics.js?v=2" defer></script>
-    <script src="tools/wordle/game.js?v=3" defer></script>
-    <script src="tools/game2048/mechanics.js?v=2" defer></script>
-    <script src="tools/game2048/game.js?v=2" defer></script>
-    <script src="tools/typing/mechanics.js?v=3" defer></script>
-    <script src="tools/typing/game.js?v=2" defer></script>
   </head>
   <body>
     <div class="site-shell">
@@ -50,7 +43,7 @@
           </div>
         </section>
 
-        <section class="section-block" aria-labelledby="projects-title">
+        <section class="section-block" id="projects" aria-labelledby="projects-title">
           <div class="section-heading">
             <h2 id="projects-title"><span aria-hidden="true">##</span> what do i do?</h2>
             <span class="section-count" id="project-count">03 projects</span>
@@ -164,13 +157,14 @@
             <button
               type="button"
               class="game-card game-card--numbers"
-              data-game-open="game2048"
+              data-game-open="2048"
               aria-controls="game-2048"
               aria-expanded="false"
             >
               <span class="game-card-art nb-art" aria-hidden="true">
-                <i></i><i class="nb-tile nb-tile--4">2</i><i class="nb-tile nb-tile--8">4</i><i></i>
-                <i class="nb-tile nb-tile--8">8</i><i></i><i class="nb-tile nb-tile--16">16</i><i></i>
+                <i>2</i><i>4</i><i></i><i>8</i>
+                <i></i><i>8</i><i>16</i><i></i>
+                <i>4</i><i></i><i>32</i><i>64</i>
               </span>
               <span class="game-card-copy">
                 <strong>2048</strong>
@@ -185,7 +179,8 @@
               aria-expanded="false"
             >
               <span class="game-card-art typing-art" aria-hidden="true">
-                <i>t</i><i>y</i><i>p</i><i>e</i><i>r</i><i>…</i><i>i</i><i>t</i>
+                <i>t</i><i>y</i><i>p</i><i>e</i><i>r</i>
+                <i>a</i><i>s</i><i>d</i><i>f</i><i>↵</i>
               </span>
               <span class="game-card-copy">
                 <strong>typing test</strong>
@@ -226,8 +221,10 @@
               <ol class="block-leaderboard-list" id="block-leaderboard-list"></ol>
             </dialog>
             <div class="block-layout">
-              <div class="block-board" id="block-board" role="grid" aria-label="BlockBlast board"></div>
-              <div class="block-floating-scores" id="block-floating-scores" aria-hidden="true"></div>
+              <div class="block-board-wrap">
+                <div class="block-board" id="block-board" role="grid" aria-label="BlockBlast board"></div>
+                <div class="block-floating-scores" id="block-floating-scores" aria-hidden="true"></div>
+              </div>
               <aside class="block-side">
                 <div class="block-score-row">
                   <p class="score-label">score <strong id="block-score">0</strong></p>
@@ -337,7 +334,7 @@
             </dialog>
           </section>
 
-          <section class="game-panel nb-panel" id="game-2048" data-game-panel="game2048" aria-label="2048" tabindex="-1" hidden>
+          <section class="game-panel nb-panel" id="game-2048" data-game-panel="2048" aria-label="2048" tabindex="-1" hidden>
             <div class="game-intro">
               <div>
                 <h3>2048</h3>
@@ -345,18 +342,23 @@
               </div>
               <button type="button" class="small-button" data-game-close>close</button>
             </div>
-            <div class="nb-row">
-              <p class="score-label">score <strong id="nb-score">0</strong></p>
-              <p class="score-label">best <strong id="nb-best">0</strong></p>
-            </div>
-            <div class="nb-grid" id="nb-board" role="grid" aria-label="2048 board"></div>
-            <div class="nb-side">
-              <button type="button" class="small-button" id="nb-new-game">new game</button>
-            </div>
-            <p class="game-status nb-status" id="nb-status" aria-live="polite">Arrow keys or swipe.</p>
-            <div class="nb-gameover" id="nb-gameover" role="status" hidden>
-              <p class="nb-gameover-title">game over</p>
-              <p class="nb-gameover-score">final score <strong id="nb-gameover-score">0</strong></p>
+            <div class="nb-play-area">
+              <div class="nb-toolbar">
+                <div class="nb-row">
+                  <p class="score-label">score <strong id="nb-score">0</strong></p>
+                  <p class="score-label">best <strong id="nb-best">0</strong></p>
+                </div>
+                <div class="nb-side">
+                  <button type="button" class="small-button" id="nb-new-game">new game</button>
+                  <button type="button" class="small-button" id="nb-undo" disabled>undo</button>
+                </div>
+              </div>
+              <div class="nb-grid" id="nb-board" role="grid" aria-label="2048 board"></div>
+              <p class="game-status nb-status" id="nb-status" aria-live="polite">Arrow keys or swipe.</p>
+              <div class="nb-gameover" id="nb-gameover" role="status" hidden>
+                <p class="nb-gameover-title">game over</p>
+                <p class="nb-gameover-score">final score <strong id="nb-gameover-score">0</strong></p>
+              </div>
             </div>
           </section>
 
@@ -369,10 +371,13 @@
               <button type="button" class="small-button" data-game-close>close</button>
             </div>
             <div class="typing-board">
-              <div class="tt-line" id="tt-target" role="textbox" aria-live="polite"></div>
-              <textarea id="tt-input" class="typing-input" rows="3" aria-label="Type the text" spellcheck="false" autocomplete="off"></textarea>
-              <div class="typing-stats" id="tt-stats"></div>
+              <div class="typing-surface">
+                <div class="tt-line" id="tt-target"></div>
+                <textarea id="tt-input" class="typing-input" rows="3" aria-label="Type the text shown" aria-describedby="tt-target" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+              </div>
+              <p class="typing-hint">click the text or press tab to start typing</p>
               <p class="game-status typing-status" id="tt-status" aria-live="polite"></p>
+              <div class="typing-stats" id="tt-stats"></div>
             </div>
             <div class="typing-side">
               <button type="button" class="small-button" id="tt-new">new test</button>

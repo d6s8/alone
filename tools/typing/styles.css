@@ -1,27 +1,32 @@
 /* Typing test (monkeytype-like) styles */
 
 .typing-art {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 3px;
-  height: 30px;
+  display: grid;
+  grid-template-columns: repeat(5, 38px);
+  gap: 4px;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 19px;
   font-weight: 700;
-  color: var(--green);
-  opacity: 0.8;
 }
 
 .typing-art i {
-  width: 18px;
-  height: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--line);
-  background: var(--surface-raised);
-  color: var(--text);
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: rgba(134, 182, 202, 0.2);
+  color: rgba(227, 244, 246, 0.7);
+  font-style: normal;
+}
+
+.typing-art i:nth-child(3), .typing-art i:nth-child(9) {
+  background: rgba(108, 184, 177, 0.45);
+}
+
+@media (max-width: 420px) {
+  .typing-art { grid-template-columns: repeat(5, 29px); gap: 3px; }
+  .typing-art i { width: 29px; height: 29px; font-size: 14px; }
 }
 
 .typing-art i.is-present {
@@ -37,17 +42,34 @@
 .typing-board {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.typing-surface {
+  position: relative;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #15171c;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.typing-surface:focus-within {
+  border-color: rgba(232, 173, 118, 0.65);
+  background: #181a1f;
 }
 
 .tt-line {
   display: flex;
   flex-wrap: wrap;
   font-family: var(--mono);
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1.35;
+  font-size: clamp(19px, 2.8vw, 27px);
+  font-weight: 500;
+  line-height: 1.65;
   color: var(--text);
   min-height: 2.4em;
 }
@@ -58,7 +80,7 @@
 }
 
 .tt-char.is-correct {
-  color: var(--green);
+  color: #e7e5df;
 }
 
 .tt-char.is-error {
@@ -67,16 +89,16 @@
 }
 
 .tt-char.is-rest {
-  color: var(--muted);
+  color: #777a84;
   font-weight: 500;
 }
 
 .tt-cursor {
   display: inline-block;
-  width: 0.55em;
-  height: 0.85em;
-  margin-left: 0.12em;
-  border-left: 2px solid var(--text);
+  width: 0;
+  height: 1.1em;
+  align-self: center;
+  border-left: 2px solid var(--orange);
   animation: tt-cursor-blink 1s steps(1) infinite;
 }
 
@@ -87,21 +109,25 @@
 }
 
 .typing-input {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  min-width: 220px;
-  box-sizing: border-box;
-  padding: 10px 12px;
-  font-family: var(--mono);
-  font-size: 15px;
-  color: var(--text);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  outline: none;
+  height: 100%;
+  min-width: 0;
+  margin: 0;
+  opacity: 0.01;
+  resize: none;
+  cursor: text;
 }
 
-.typing-input:focus {
-  border-color: var(--orange);
+.typing-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.typing-board:has(.typing-input:focus) .typing-hint {
+  opacity: 0.5;
 }
 
 .typing-stats {
@@ -110,11 +136,16 @@
 }
 
 .typing-status {
-  color: var(--muted);
+  margin: 8px 0 0;
+  color: var(--orange);
+  font-size: 13px;
 }
 
 .typing-side {
-  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
 }
 
 .word-stats-body {
@@ -131,10 +162,10 @@
 
 @media (max-width: 700px) {
   .tt-line {
-    font-size: 17px;
+    font-size: 19px;
   }
-  .typing-input {
-    min-width: 0;
-    padding: 8px 10px;
+  .typing-surface {
+    min-height: 130px;
+    padding: 18px;
   }
 }

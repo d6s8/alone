@@ -7,6 +7,8 @@
   const bestEl = document.getElementById("nb-best");
   const statusEl = document.getElementById("nb-status");
   const newGameBtn = document.getElementById("nb-new-game");
+  const undoBtn = document.getElementById("nb-undo");
+  const panel = document.getElementById("game-2048");
   const gameOverEl = document.getElementById("nb-gameover");
   const gameOverScoreEl = document.getElementById("nb-gameover-score");
   const SIZE = 4;
@@ -18,6 +20,7 @@
   let best = readBest();
   let lost = false;
   let won = false;
+  let previous = null;
 
   const keyMap = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" };
   let touchStart = null;
@@ -53,6 +56,8 @@
     score = 0;
     won = false;
     lost = false;
+    previous = null;
+    undoBtn.disabled = true;
     statusEl.textContent = "";
     if (gameOverEl) gameOverEl.hidden = true;
     render();
@@ -74,6 +79,7 @@
   }
 
   function applyMove(direction) {
+    if (lost || panel.hidden) return;
     const before = grid.map((row) => row.slice());
     let gained = 0;
     if (direction === "left") gained = M.moveLeft(grid);
@@ -82,6 +88,8 @@
     else if (direction === "down") gained = M.moveDown(grid);
     const moved = before.some((row, r) => grid[r].some((v, c) => v !== row[c]));
     if (!moved) return;
+    previous = { grid: before, score, won };
+    undoBtn.disabled = false;
     score += gained;
     M.spawnTile(grid, Math.random);
     if (score > best) {
@@ -96,8 +104,7 @@
     if (lost) return;
     if (!won && M.hasWin(grid, WIN_TILE)) {
       won = true;
-      statusEl.textContent = "You reached 2048!";
-      return;
+      statusEl.textContent = "You reached 2048! Keep playing.";
     }
     if (!M.canMove(grid)) {
       lost = true;
@@ -106,19 +113,28 @@
     }
   }
 
-  newGameBtn.addEventListener("click", () => {
-    if (lost || won) newGame();
-    else statusEl.textContent = "Keep sliding.";
+  newGameBtn.addEventListener("click", newGame);
+  undoBtn.addEventListener("click", () => {
+    if (!previous) return;
+    grid = previous.grid;
+    score = previous.score;
+    won = previous.won;
+    previous = null;
+    lost = false;
+    undoBtn.disabled = true;
+    gameOverEl.hidden = true;
+    statusEl.textContent = "Move undone.";
+    render();
   });
 
   document.addEventListener("keydown", (event) => {
     const direction = keyMap[event.key];
-    if (!direction || lost || event.repeat) return;
+    if (!direction || panel.hidden || lost || event.repeat || event.altKey || event.ctrlKey || event.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName)) return;
     event.preventDefault();
     applyMove(direction);
   });
 
-  document.addEventListener(
+  boardEl.addEventListener(
     "touchstart",
     (event) => {
       const touch = event.touches[0];
@@ -127,7 +143,7 @@
     { passive: true },
   );
 
-  document.addEventListener("touchend", (event) => {
+  boardEl.addEventListener("touchend", (event) => {
     if (!touchStart) return;
     const touch = event.changedTouches[0];
     const start = touchStart;
@@ -135,9 +151,11 @@
     if (!touch) return;
     const dx = touch.clientX - start.x;
     const dy = touch.clientY - start.y;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
     const direction = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : dy > 0 ? "down" : "up";
     applyMove(direction);
   });
+  boardEl.addEventListener("touchcancel", () => { touchStart = null; });
 
   newGame();
   statusEl.textContent = "Arrow keys or swipe.";

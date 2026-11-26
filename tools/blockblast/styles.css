@@ -9,6 +9,12 @@
   margin-top: 20px;
 }
 
+.block-board-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+}
+
 .block-board {
   width: 100%;
   max-width: 336px;
@@ -455,27 +461,41 @@
 .block-floating-scores {
   position: absolute;
   inset: 0;
+  z-index: 100;
   pointer-events: none;
 }
 
 .block-floating-score {
   position: absolute;
-  font-size: 13px;
+  left: 50%;
+  top: 50%;
+  font-size: 24px;
   font-weight: 700;
-  color: var(--orange);
-  text-shadow: 0 0 8px rgba(231, 173, 107, 0.6);
+  color: #f4f3ef;
+  background: transparent;
+  padding: 0;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.8);
   white-space: nowrap;
-  animation: floatScore 0.9s ease-out forwards;
+  transition: none;
+  animation: floatScore 1.2s ease-out forwards;
 }
 
 @keyframes floatScore {
   0% {
+    opacity: 0.35;
+    transform: translate(-50%, -45%) scale(0.96);
+  }
+  6% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translate(-50%, -50%) scale(1);
+  }
+  65% {
+    opacity: 1;
+    transform: translate(-50%, calc(-50% - 8px)) scale(1);
   }
   100% {
     opacity: 0;
-    transform: translateY(-40px) scale(0.9);
+    transform: translate(-50%, calc(-50% - 20px)) scale(1);
   }
 }
 
@@ -487,13 +507,37 @@
   z-index: 50;
   opacity: 0.85;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
-  transition: left 0.1s cubic-bezier(0.4, 0, 0.2, 1), top 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.block-floating-score strong, .block-floating-score span {
+  display: block;
+  text-align: center;
+}
+.block-floating-score span {
+  color: #e9a955;
+  font-size: 0.65em;
+  margin-top: 0.2em;
 }
 
 .block-drag-cell {
   width: 40px;
   height: 40px;
   border-radius: 2px;
+}
+
+/* Drag cells are outside the board, so they need their own colour rules. */
+.block-drag-cell.block-color-1 { background: #4f8a7c; }
+.block-drag-cell.block-color-2 { background: #8a6d96; }
+.block-drag-cell.block-color-3 { background: #9c8765; }
+.block-drag-cell.block-color-4 { background: #637a89; }
+.block-drag-cell.block-color-5 { background: #9c7373; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .block-drag-ghost { animation: block-drag-lift 140ms ease-out both; }
+  @keyframes block-drag-lift {
+    from { opacity: 0; transform: scale(0.75); }
+    to { opacity: 0.85; transform: scale(1); }
+  }
 }
 
 .block-pieces {

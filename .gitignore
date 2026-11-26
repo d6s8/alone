@@ -5,6 +5,7 @@
 .vscode/
 .api
 node_modules/
+dist/
 *.log
 
 .updates

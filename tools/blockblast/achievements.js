@@ -1,0 +1,28 @@
+"use strict";
+
+window.blockAchievementDefinitions = [
+    ["first-place", "place your first block", (stats, run) => stats.totalPlacements >= 1],
+    ["first-clear", "clear a row or column", (stats, run) => stats.totalLines >= 1],
+    ["double-clear", "clear two lines at once", (stats, run) => run.linesAtOnce >= 2],
+    ["triple-clear", "clear three lines at once", (stats, run) => run.linesAtOnce >= 3],
+    ["five-clear", "clear five lines at once", (stats, run) => run.linesAtOnce >= 5],
+    ["combo-three", "clear lines three moves in a row", (stats, run) => run.combo >= 3],
+    ["combo-five", "clear lines five moves in a row", (stats, run) => run.combo >= 5],
+    ["score-100", "score 100 points in one run", (stats, run) => run.score >= 100],
+    ["score-250", "score 250 points in one run", (stats, run) => run.score >= 250],
+    ["score-500", "score 500 points in one run", (stats, run) => run.score >= 500],
+    ["score-1000", "score 1,000 points in one run", (stats, run) => run.score >= 1000],
+    ["score-2500", "score 2,500 points in one run", (stats, run) => run.score >= 2500],
+    ["place-10", "place ten blocks in one run", (stats, run) => run.placements >= 10],
+    ["place-25", "place 25 blocks in one run", (stats, run) => run.placements >= 25],
+    ["place-50", "place 50 blocks in one run", (stats, run) => run.placements >= 50],
+    ["lifetime-100", "place 100 blocks in total", (stats) => stats.totalPlacements >= 100],
+    ["lines-10", "clear ten lines in total", (stats) => stats.totalLines >= 10],
+    ["lines-50", "clear 50 lines in total", (stats) => stats.totalLines >= 50],
+    ["use-hold", "use the hold slot", (stats, run) => run.usedHold],
+    ["play-big", "play on the 10 × 10 board", (stats) => stats.modesPlayed.includes("big")],
+    ["play-limited", "play the 50-move mode", (stats) => stats.modesPlayed.includes("limited")],
+    ["finish-limited", "finish all 50 limited moves", (stats, run) => run.finishedLimited],
+    ["play-daily", "try the daily board", (stats) => stats.modesPlayed.includes("daily")],
+    ["all-modes", "try every game mode", (stats) => stats.modesPlayed.length === 5],
+  ];

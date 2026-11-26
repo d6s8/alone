@@ -37,32 +37,17 @@
   const blockModeTabs = Array.from(document.querySelectorAll("[data-block-mode]"));
   const blockGameOverDialog = document.getElementById("block-gameover");
   const blockGameOverScore = document.getElementById("block-gameover-score");
-  function spawnFloatingPoints(clientX, clientY, value) {
-    const rect = blockBoardElement.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+  function spawnFloatingPoints(value, lines) {
     const el = document.createElement("div");
     el.className = "block-floating-score";
-    el.textContent = "+" + value;
-    el.style.left = x + "px";
-    el.style.top = y + "px";
+    const score = document.createElement("strong");
+    score.textContent = "+" + value;
+    const label = document.createElement("span");
+    label.textContent = `${lines} ${lines === 1 ? "line" : "lines"}`;
+    el.append(score, label);
     blockFloatingScoresElement.appendChild(el);
-    floatingScores.push({ x, y, value, life: 1.0, el });
-  }
-
-  function updateFloatingScores(delta) {
-    for (let i = floatingScores.length - 1; i >= 0; i--) {
-      const fs = floatingScores[i];
-      fs.life -= delta * 1.2;
-      fs.y -= delta * 60;
-      fs.el.style.top = fs.y + "px";
-      fs.el.style.opacity = String(Math.max(0, fs.life));
-      fs.el.style.transform = "translateY(" + String(-(1 - fs.life) * 40) + "px)";
-      if (fs.life <= 0) {
-        fs.el.remove();
-        floatingScores.splice(i, 1);
-      }
-    }
+    el.addEventListener("animationend", () => el.remove(), { once: true });
+    window.setTimeout(() => el.remove(), 2000);
   }
 
   // ---- Drag ghost (smooth following piece under cursor) ----
@@ -70,19 +55,20 @@
   function createDragGhost(shapeIndex) {
     if (blockDragGhost) removeDragGhost();
     const shape = blockShapes[shapeIndex];
-    const cellSize = 40; // matches .block-cell sizing on desktop
+    const cellSize = blockDragMetrics.cellSize;
+    const gap = blockDragMetrics.gap;
     const ghost = document.createElement("div");
     ghost.className = "block-drag-ghost";
     const maxR = Math.max(...shape.map(([dr]) => dr));
     const maxC = Math.max(...shape.map(([, dc]) => dc));
-    const w = (maxC + 1) * cellSize;
-    const h = (maxR + 1) * cellSize;
+    const w = (maxC + 1) * cellSize + maxC * gap;
+    const h = (maxR + 1) * cellSize + maxR * gap;
     ghost.style.width = w + "px";
     ghost.style.height = h + "px";
     ghost.style.display = "grid";
     ghost.style.gridTemplateColumns = "repeat(" + (maxC + 1) + ", " + cellSize + "px)";
     ghost.style.gridTemplateRows = "repeat(" + (maxR + 1) + ", " + cellSize + "px)";
-    ghost.style.gap = "4px";
+    ghost.style.gap = gap + "px";
     ghost.style.position = "fixed";
     ghost.style.pointerEvents = "none";
     ghost.style.zIndex = "50";
@@ -93,6 +79,8 @@
       cell.style.width = cellSize + "px";
       cell.style.height = cellSize + "px";
       cell.style.borderRadius = "2px";
+      cell.style.gridRow = String(dr + 1);
+      cell.style.gridColumn = String(dc + 1);
       ghost.appendChild(cell);
     }
     document.body.appendChild(ghost);
@@ -104,6 +92,20 @@
     if (!blockDragGhost) return;
     blockDragGhost.style.left = (clientX - blockDragGhostOffset.x) + "px";
     blockDragGhost.style.top = (clientY - blockDragGhostOffset.y) + "px";
+  }
+
+  function dragBoardPosition(clientX, clientY) {
+    const boardRect = blockBoardElement.getBoundingClientRect();
+    if (clientX < boardRect.left || clientX >= boardRect.right ||
+        clientY < boardRect.top || clientY >= boardRect.bottom) return null;
+    const firstCell = blockBoardElement.querySelector(".block-cell");
+    if (!firstCell) return null;
+    const origin = firstCell.getBoundingClientRect();
+    const step = blockDragMetrics.cellSize + blockDragMetrics.gap;
+    return {
+      row: Math.round((clientY - blockDragGhostOffset.y - origin.top) / step),
+      column: Math.round((clientX - blockDragGhostOffset.x - origin.left) / step),
+    };
   }
 
   function removeDragGhost() {
@@ -126,32 +128,7 @@
     }
   }
 
-  const blockAchievementDefinitions = [
-    ["first-place", "place your first block", (stats, run) => stats.totalPlacements >= 1],
-    ["first-clear", "clear a row or column", (stats, run) => stats.totalLines >= 1],
-    ["double-clear", "clear two lines at once", (stats, run) => run.linesAtOnce >= 2],
-    ["triple-clear", "clear three lines at once", (stats, run) => run.linesAtOnce >= 3],
-    ["five-clear", "clear five lines at once", (stats, run) => run.linesAtOnce >= 5],
-    ["combo-three", "clear lines three moves in a row", (stats, run) => run.combo >= 3],
-    ["combo-five", "clear lines five moves in a row", (stats, run) => run.combo >= 5],
-    ["score-100", "score 100 points in one run", (stats, run) => run.score >= 100],
-    ["score-250", "score 250 points in one run", (stats, run) => run.score >= 250],
-    ["score-500", "score 500 points in one run", (stats, run) => run.score >= 500],
-    ["score-1000", "score 1,000 points in one run", (stats, run) => run.score >= 1000],
-    ["score-2500", "score 2,500 points in one run", (stats, run) => run.score >= 2500],
-    ["place-10", "place ten blocks in one run", (stats, run) => run.placements >= 10],
-    ["place-25", "place 25 blocks in one run", (stats, run) => run.placements >= 25],
-    ["place-50", "place 50 blocks in one run", (stats, run) => run.placements >= 50],
-    ["lifetime-100", "place 100 blocks in total", (stats) => stats.totalPlacements >= 100],
-    ["lines-10", "clear ten lines in total", (stats) => stats.totalLines >= 10],
-    ["lines-50", "clear 50 lines in total", (stats) => stats.totalLines >= 50],
-    ["use-hold", "use the hold slot", (stats, run) => run.usedHold],
-    ["play-big", "play on the 10 × 10 board", (stats) => stats.modesPlayed.includes("big")],
-    ["play-limited", "play the 50-move mode", (stats) => stats.modesPlayed.includes("limited")],
-    ["finish-limited", "finish all 50 limited moves", (stats, run) => run.finishedLimited],
-    ["play-daily", "try the daily board", (stats) => stats.modesPlayed.includes("daily")],
-    ["all-modes", "try every game mode", (stats) => stats.modesPlayed.length === 5],
-  ];
+  const blockAchievementDefinitions = window.blockAchievementDefinitions;
 
   const savedBlockStats = readSavedValue("alone.block.stats.v1") || {};
   const blockLifetimeStats = {
@@ -185,13 +162,11 @@
   let blockFinished = false;
   let blockCombo = 0;
 
-  // Floating score pop-ups
-  const floatingScores = []; // { x, y, value, life, el }
-
   // Drag ghost (smooth following piece under cursor)
   let blockDragGhost = null;
   let blockDragGhostShape = null;
   let blockDragGhostOffset = { x: 0, y: 0 };
+  let blockDragMetrics = { cellSize: 40, gap: 3 };
   let blockRandom = Math.random;
   let blockDailyKey = currentUtcDateKey();
   let blockRun = {};
@@ -451,21 +426,20 @@
 
   function animateBlockClears(rows, columns) {
     if (motionIsReduced() || typeof Element.prototype.animate !== "function") return;
-    const rect = blockBoardElement.getBoundingClientRect();
     const overlay = blockBoardElement.cloneNode(true);
     overlay.removeAttribute("id");
     overlay.setAttribute("aria-hidden", "true");
     Object.assign(overlay.style, {
-      position: "fixed",
-      left: `${rect.left}px`,
-      top: `${rect.top}px`,
-      width: `${rect.width}px`,
-      height: `${rect.height}px`,
+      position: "absolute",
+      left: "0",
+      top: "0",
+      width: "100%",
+      height: "100%",
       margin: "0",
-      zIndex: "1000",
+      zIndex: "1",
       pointerEvents: "none",
     });
-    document.body.append(overlay);
+    blockBoardElement.parentElement.append(overlay);
 
     const rowSet = new Set(rows);
     const columnSet = new Set(columns);
@@ -864,15 +838,9 @@
     blockScore += pointsGained;
     blockRun.score = blockScore;
 
-    // Floating score pop-up at the placed piece centre
+    // Show the score in the centre of the board, above its cells.
     if (clearedLineCount > 0 || boardClearBonus > 0) {
-      const rect = blockBoardElement.getBoundingClientRect();
-      const cellSize = rect.width / blockSize;
-      const shapeH = Math.max(...shape.map(([dr]) => dr)) + 1;
-      const shapeW = Math.max(...shape.map(([, dc]) => dc)) + 1;
-      const cx = rect.left + (left + shapeW / 2) * cellSize;
-      const cy = rect.top + (top + shapeH / 2) * cellSize;
-      spawnFloatingPoints(cx, cy, pointsGained);
+      spawnFloatingPoints(pointsGained, clearedLineCount);
     }
 
     if (blockPieces.every((shapeItem) => shapeItem === null)) {
@@ -924,13 +892,16 @@
     event.preventDefault();
 
     // Create drag ghost following the cursor
-    const shapeIndex = blockDraggingPiece;
+    const shapeIndex = blockPieces[blockDraggingPiece];
     const shape = blockShapes[shapeIndex];
     const maxR = Math.max(...shape.map(([dr]) => dr));
     const maxC = Math.max(...shape.map(([, dc]) => dc));
-    const cellSize = 40;
-    blockDragGhostOffset.x = (maxC / 2) * cellSize; // centre ghost on cursor
-    blockDragGhostOffset.y = (maxR / 2) * cellSize;
+    const firstCell = blockBoardElement.querySelector(".block-cell");
+    const cellSize = firstCell.getBoundingClientRect().width;
+    const gap = parseFloat(getComputedStyle(blockBoardElement).columnGap) || 0;
+    blockDragMetrics = { cellSize, gap };
+    blockDragGhostOffset.x = ((maxC + 1) * cellSize + maxC * gap) / 2;
+    blockDragGhostOffset.y = ((maxR + 1) * cellSize + maxR * gap) / 2;
     createDragGhost(shapeIndex);
     updateDragGhost(event.clientX, event.clientY);
   });
@@ -940,13 +911,12 @@
       return;
     }
     updateDragGhost(event.clientX, event.clientY);
-    const target = document.elementFromPoint(event.clientX, event.clientY);
-    const cell = target && target.closest(".block-cell");
-    if (!cell || !blockBoardElement.contains(cell)) {
+    const position = dragBoardPosition(event.clientX, event.clientY);
+    if (!position) {
       clearBlockPreview();
       return;
     }
-    updateBlockPreview(Number(cell.dataset.row), Number(cell.dataset.column), blockDraggingPiece);
+    updateBlockPreview(position.row, position.column, blockDraggingPiece);
   });
 
   document.addEventListener("pointerup", (event) => {
@@ -955,13 +925,13 @@
     }
     const pieceIndex = blockDraggingPiece;
     const target = document.elementFromPoint(event.clientX, event.clientY);
-    const cell = target && target.closest(".block-cell");
+    const position = dragBoardPosition(event.clientX, event.clientY);
     const holdSlot = target && target.closest("#block-hold-button");
 
     if (holdSlot && blockMode === "hold") {
       swapBlockHold(pieceIndex);
-    } else if (cell && blockBoardElement.contains(cell)) {
-      placeBlockShape(pieceIndex, Number(cell.dataset.row), Number(cell.dataset.column));
+    } else if (position) {
+      if (!placeBlockShape(pieceIndex, position.row, position.column)) clearBlockPreview();
     } else {
       clearBlockPreview();
       blockSelectedPiece = pieceIndex;
@@ -1046,13 +1016,4 @@
   renderBlockAchievements();
   startBlockGame("classic");
 
-  // Animation loop: floating scores + drag ghost
-  let lastTime = performance.now();
-  function animate(now) {
-    const delta = (now - lastTime) / 1000;
-    lastTime = now;
-    updateFloatingScores(delta);
-    requestAnimationFrame(animate);
-  }
-  requestAnimationFrame(animate);
 })();

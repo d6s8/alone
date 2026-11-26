@@ -791,6 +791,14 @@ button {
   background: linear-gradient(120deg, #35432f, #252b25);
 }
 
+.game-card--numbers {
+  background: linear-gradient(120deg, #3a3530, #292729);
+}
+
+.game-card--words {
+  background: linear-gradient(120deg, #2b3b42, #252c34);
+}
+
 .game-card-art {
   position: absolute;
   z-index: 0;
